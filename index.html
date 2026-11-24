@@ -1103,8 +1103,12 @@
 
   function getFilteredNews() {
     const list = portalData.news || [];
-    if (currentCategory === 'Tất cả') return list;
-    return list.filter(n => n.category === currentCategory);
+    
+    // Lọc bỏ các bài viết có chuyên mục là "Trang tĩnh" ra khỏi danh sách hiển thị
+    const publicNews = list.filter(n => String(n.category).trim() !== 'Trang tĩnh');
+    
+    if (currentCategory === 'Tất cả') return publicNews;
+    return publicNews.filter(n => n.category === currentCategory);
   }
 
   function renderNews() {
