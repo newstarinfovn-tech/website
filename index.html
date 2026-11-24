@@ -149,9 +149,9 @@
         <li class="nav-item relative">
           <a href="#co-so-dich-vu" class="nav-pill inline-flex items-center gap-1 px-2.5 py-3.5 hover:text-gold-400 hover:bg-white/10 rounded-t-lg whitespace-nowrap transition"><span>Giới thiệu</span><svg class="w-3.5 h-3.5 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="6 9 12 15 18 9"/></svg></a>
           <div class="nav-dropdown opacity-0 invisible translate-y-2 transition-all duration-200 absolute left-0 top-full w-56 bg-white text-navy-900 rounded-b-xl border border-slate-200 border-t-[3px] border-t-gold-500 shadow-xl p-1.5 z-50">
-            <button type="button" onclick="openArticle('tu-gioi-thieu')" class="w-full text-left flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-royal-50 hover:text-royal-600 text-sm font-semibold transition"><span class="text-gold-500 font-bold">›</span> Tự giới thiệu</button>
-            <button type="button" onclick="openArticle('co-so-vat-chat')" class="w-full text-left flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-royal-50 hover:text-royal-600 text-sm font-semibold transition"><span class="text-gold-500 font-bold">›</span> Cơ sở vật chất</button>
-            <button type="button" onclick="openArticle('dich-vu-hoc-duong')" class="w-full text-left flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-royal-50 hover:text-royal-600 text-sm font-semibold transition"><span class="text-gold-500 font-bold">›</span> Dịch vụ học đường</button>
+            <button type="button" onclick="openArticle('tu-gioi-thieu', 'Tự giới thiệu')" class="w-full text-left flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-royal-50 hover:text-royal-600 text-sm font-semibold transition"><span class="text-gold-500 font-bold">›</span> Tự giới thiệu</button>
+            <button type="button" onclick="openArticle('co-so-vat-chat', 'Cơ sở vật chất')" class="w-full text-left flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-royal-50 hover:text-royal-600 text-sm font-semibold transition"><span class="text-gold-500 font-bold">›</span> Cơ sở vật chất</button>
+            <button type="button" onclick="openArticle('dich-vu-hoc-duong', 'Dịch vụ học đường')" class="w-full text-left flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-royal-50 hover:text-royal-600 text-sm font-semibold transition"><span class="text-gold-500 font-bold">›</span> Dịch vụ học đường</button>
           </div>
         </li>
         <li class="nav-item relative">
@@ -1343,7 +1343,7 @@
   /* =====================================================
      8. MODAL — BÀI VIẾT (3 NHÁNH)
      ===================================================== */
-  function openArticle(id) {
+  function openArticle(id, menuName) {
     const article = (portalData.news || []).find(n => String(n.id) === String(id));
     if (!article) {
       toast('Bài viết không tồn tại hoặc đã bị gỡ.', 'warning');
@@ -1353,7 +1353,7 @@
     const hasSource = isValidUrl(article.sourceUrl);
 
     if (hasContent) {
-      openArticleModal(article);
+      openArticleModal(article, menuName);
       return;
     }
     if (hasSource) {
@@ -1363,15 +1363,20 @@
     }
     openArticleModal(Object.assign({}, article, {
       content: '<p class="text-slate-500 italic">Nội dung bài viết đang được cập nhật. Vui lòng quay lại sau.</p>'
-    }));
+    }), menuName);
   }
 
-  function openArticleModal(article) {
+  function openArticleModal(article, menuName) {
     incrementArticleView(article.id);
     const hasSource = isValidUrl(article.sourceUrl);
 
-    document.getElementById('portal-modal-kicker').textContent =
-      (article.category || 'Tin tức') + ' • ' + (article.date || '');
+    let kickerText = '';
+    if (String(article.category).trim() === 'Trang tĩnh') {
+      kickerText = menuName || 'Giới thiệu'; 
+    } else {
+      kickerText = (article.category || 'Tin tức') + ' • ' + (article.date || '');
+    }
+    document.getElementById('portal-modal-kicker').textContent = kickerText;
     document.getElementById('portal-modal-title').textContent = article.title || '';
 
     const imgBlock = article.imageUrl ? `
