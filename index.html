@@ -1108,8 +1108,18 @@
   function renderNewsFilters() {
     const container = document.getElementById('news-filter-pills');
     if (!container) return;
+    
+    // Danh sách các chuyên mục KHÔNG muốn hiện lên thanh lọc
+    const hiddenCategories = ['Trang tĩnh', 'FAQ', 'Tuyển dụng'];
+    
     const cats = ['Tất cả'];
-    (portalData.news || []).forEach(n => { if (n.category && cats.indexOf(n.category) < 0) cats.push(n.category); });
+    (portalData.news || []).forEach(n => { 
+      const cat = String(n.category || '').trim();
+      if (cat && cats.indexOf(cat) < 0 && !hiddenCategories.includes(cat)) {
+        cats.push(cat); 
+      }
+    });
+    
     container.innerHTML = cats.map(cat => `
       <button type="button" onclick="setNewsCategory('${escapeHTML(cat).replace(/'/g, "\\'")}')" class="px-3 py-1 rounded-full text-[11px] font-bold transition ${currentCategory === cat ? 'bg-navy-900 text-gold-400' : 'bg-slate-100 text-slate-700 hover:bg-royal-50 hover:text-royal-600'}">${escapeHTML(cat)}</button>
     `).join('');
