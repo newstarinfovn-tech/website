@@ -374,7 +374,7 @@
             <div class="p-5 flex-1 flex flex-col justify-between gap-4">
               <!-- Nội dung câu hỏi sẽ được tự động đổ vào đây -->
               <div id="faq-list" class="space-y-2"></div>
-              <button type="button" onclick="openContactInfoModal('Gửi câu hỏi tư vấn tuyển sinh')" class="w-full py-2.5 rounded-xl bg-navy-900 hover:bg-royal-600 text-white font-bold text-xs sm:text-sm transition">Gửi câu hỏi tư vấn</button>
+              <button type="button" onclick="openContactFormModal('Gửi câu hỏi tư vấn tuyển sinh')" class="w-full py-2.5 rounded-xl bg-navy-900 hover:bg-royal-600 text-white font-bold text-xs sm:text-sm transition">Gửi câu hỏi tư vấn</button>
             </div>
           </div>
 
@@ -398,7 +398,7 @@
                 <div>• <strong>ĐT:</strong> <span id="recruit-phone-text">0789089123</span></div>
                 <div>• <strong>Địa điểm:</strong> 185 Chùa Láng / 4 Dương Khuê, Hà Nội.</div>
               </div>
-              <button type="button" onclick="openContactInfoModal('Gửi hồ sơ ứng tuyển')" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-gold-500 to-gold-400 text-navy-950 font-extrabold text-xs sm:text-sm shadow-goldBtn hover:brightness-105 transition">Liên hệ Phòng Nhân sự</button>
+              <button type="button" onclick="openContactFormModal('Gửi hồ sơ ứng tuyển')" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-gold-500 to-gold-400 text-navy-950 font-extrabold text-xs sm:text-sm shadow-goldBtn hover:brightness-105 transition">Liên hệ Phòng Nhân sự</button>
             </div>
           </div>
         </section>
@@ -562,7 +562,7 @@
   /* =====================================================
      1. CẤU HÌNH & HẰNG SỐ
      ===================================================== */
-  const DEFAULT_CMS_API_URL = 'https://script.google.com/macros/s/AKfycbyA4dqn2BsAnkismjj6ECL2QfsSmPnt-sdwJuSwL7LYdZmOIlH8U1b9wShRXgJlx2C_eQ/exec';
+  const DEFAULT_CMS_API_URL = 'https://script.google.com/macros/s/AKfycbwhm4ULf74sckl6E0t--khwxJIxxgQe53zBvJzl4H-BB4VuP2RoVT4O1lM9CEOEQlHz/exec';
   const STORAGE_CMS_URL_KEY   = 'newstar_cms_url';
   const STORAGE_CMS_CACHE_KEY = 'newstar_cms_cache_v4';
   const CACHE_TTL_MS = 15 * 60 * 1000;
@@ -1472,7 +1472,103 @@
     document.getElementById('portal-modal-backdrop').classList.remove('hidden');
     document.body.style.overflow = 'hidden';
   }
+  // Hàm hiển thị Form Liên hệ
+  function openContactFormModal(type) {
+    document.getElementById('portal-modal-kicker').textContent = 'Gửi thông tin cho Newstar';
+    document.getElementById('portal-modal-title').textContent = type;
+    document.getElementById('portal-modal-body').innerHTML = `
+      <form id="contact-form" onsubmit="submitContactForm(event, '${type}')" class="space-y-4">
+        <input type="text" name="website_hp" style="display:none;" tabindex="-1" autocomplete="off"> <!-- Chống Spam -->
+        
+        <div>
+          <label class="block text-xs font-bold text-navy-900 mb-1">Họ và tên <span class="text-red-500">*</span></label>
+          <input type="text" name="name" required placeholder="Nhập họ tên của bạn..." class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-royal-600 focus:ring-2 focus:ring-royal-100 outline-none transition">
+        </div>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-navy-900 mb-1">Số điện thoại <span class="text-red-500">*</span></label>
+            <input type="tel" name="phone" required placeholder="Nhập số điện thoại..." class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-royal-600 focus:ring-2 focus:ring-royal-100 outline-none transition">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-navy-900 mb-1">Email</label>
+            <input type="email" name="email" placeholder="Nhập địa chỉ email..." class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-royal-600 focus:ring-2 focus:ring-royal-100 outline-none transition">
+          </div>
+        </div>
 
+        <div>
+          <label class="block text-xs font-bold text-navy-900 mb-1">Nội dung chi tiết</label>
+          <textarea name="message" rows="3" placeholder="Nhập câu hỏi hoặc nội dung cần hỗ trợ..." class="w-full px-4 py-2.5 rounded-xl border border-slate-300 focus:border-royal-600 focus:ring-2 focus:ring-royal-100 outline-none transition"></textarea>
+        </div>
+
+        <div class="pt-2">
+          <button type="submit" id="btn-submit-contact" class="w-full py-3 rounded-xl bg-gradient-to-r from-royal-600 to-navy-900 text-white font-extrabold text-sm shadow-lg hover:brightness-110 transition flex justify-center items-center gap-2">
+            <span>Gửi Thông Tin Ngay</span>
+          </button>
+        </div>
+      </form>
+    `;
+    
+    document.getElementById('portal-modal-footer').innerHTML = `
+      <div class="text-[11px] text-slate-500 w-full text-center">Thông tin của bạn được bảo mật tuyệt đối.</div>
+    `;
+    
+    document.getElementById('portal-modal-backdrop').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+
+  // Hàm xử lý khi khách bấm nút "Gửi"
+  async function submitContactForm(event, type) {
+    event.preventDefault();
+    const form = event.target;
+    const btn = document.getElementById('btn-submit-contact');
+    
+    // Kiểm tra Honeypot (Chống Bot Spam)
+    if (form.website_hp.value) return; 
+
+    const data = {
+      action: 'sendcontact',
+      type: type,
+      name: form.name.value.trim(),
+      phone: form.phone.value.trim(),
+      email: form.email.value.trim(),
+      message: form.message.value.trim()
+    };
+
+    btn.innerHTML = 'Đang gửi...';
+    btn.disabled = true;
+
+    try {
+      const url = getCmsUrl();
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // Dùng text/plain để tránh lỗi CORS
+        body: JSON.stringify(data)
+      });
+      
+      const json = await res.json();
+      
+      if (json.success) {
+        document.getElementById('portal-modal-body').innerHTML = `
+          <div class="text-center py-8">
+            <div class="w-16 h-16 bg-emerald-100 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">✓</div>
+            <h3 class="text-lg font-extrabold text-navy-900 mb-2">Gửi thành công!</h3>
+            <p class="text-sm text-slate-600 mb-4">Cảm ơn bạn đã liên hệ. Nhà trường sẽ phản hồi trong thời gian sớm nhất.</p>
+          </div>
+        `;
+        document.getElementById('portal-modal-footer').innerHTML = `
+          <button type="button" onclick="closePortalModal()" class="w-full py-2.5 rounded-xl bg-navy-900 hover:bg-royal-600 text-white font-bold text-sm transition">Đóng cửa sổ</button>
+        `;
+      } else {
+        throw new Error(json.error || 'Có lỗi xảy ra');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Lỗi khi gửi thông tin: ' + err.message + '\nVui lòng thử lại hoặc gọi hotline.');
+      btn.innerHTML = '<span>Gửi Thông Tin Ngay</span>';
+      btn.disabled = false;
+    }
+  }
   function openContactInfoModal(title) {
     document.getElementById('portal-modal-kicker').textContent = 'Liên hệ';
     document.getElementById('portal-modal-title').textContent = title || 'Gửi thông tin liên hệ';
