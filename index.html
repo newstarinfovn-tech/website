@@ -1802,16 +1802,41 @@
   /* =====================================================
      13. STATS (demo)
      ===================================================== */
-  function renderStats() {
-    const online = 350 + Math.floor(Math.random() * 100);
-    const day    = 16000 + Math.floor(Math.random() * 1000);
-    const week   = 110000 + Math.floor(Math.random() * 10000);
-    const total  = 1100000 + Math.floor(Math.random() * 5000);
+    function renderStats() {
+    // Lấy ngày hôm nay
+    const todayStr = new Date().toDateString();
+    
+    // Lấy dữ liệu cũ từ bộ nhớ trình duyệt (nếu có)
+    let stats = JSON.parse(localStorage.getItem('newstar_stats')) || {
+      online: 350,
+      day: 16000,
+      week: 110000,
+      total: 1100000,
+      lastDate: todayStr
+    };
+
+    // Nếu sang ngày mới, reset lại số trong ngày
+    if (stats.lastDate !== todayStr) {
+      stats.day = 100 + Math.floor(Math.random() * 500); // Bắt đầu ngày mới
+      stats.lastDate = todayStr;
+    }
+
+    // Giả lập tăng lượt xem (mỗi lần F5 hoặc chuyển trang, số sẽ tăng lên 1-5 đơn vị)
+    const randomInc = Math.floor(Math.random() * 5) + 1;
+    stats.online = 350 + Math.floor(Math.random() * 50); // Số online dao động
+    stats.day += randomInc;
+    stats.week += randomInc;
+    stats.total += randomInc;
+
+    // Lưu lại vào bộ nhớ trình duyệt
+    localStorage.setItem('newstar_stats', JSON.stringify(stats));
+
+    // Hiển thị ra màn hình
     const set = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = formatNumber(val); };
-    set('stat-online', online);
-    set('stat-day', day);
-    set('stat-week', week);
-    set('stat-total', total);
+    set('stat-online', stats.online);
+    set('stat-day', stats.day);
+    set('stat-week', stats.week);
+    set('stat-total', stats.total);
   }
 
   /* =====================================================
